@@ -19,21 +19,31 @@ let string_of_base (b : base) : string =
 
 
 (* explode a string into a char list *)
-let explode (str : string) : char list =
-  failwith "À compléter"
+let rec explode (str : string) : char list =
+        if (String.length str) > 0 then [str.[0]]@explode (String.sub str 1 (String.length str - 1))
+        else []
+;; 
 
 
 (* conversions *)
 let base_of_char (c : char) : base =
-  failwith "À compléter"
-
+  match c with
+  | 'A' -> A
+  | 'T' -> T
+  | 'G' -> G
+  | 'C' -> C
+  | _ -> WC
+;;
 
 let dna_of_string (s : string) : base list =
-  failwith "À compléter"
+  List.map base_of_char (explode s)
+;;
 
 
-let string_of_dna (seq : dna) : string =
-  failwith "À compléter"
+let rec string_of_dna (seq : dna) : string =
+  match seq with
+  | [] -> ""
+  | h::t -> string_of_base h ^ string_of_dna t
 
 
 
