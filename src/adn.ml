@@ -70,9 +70,27 @@ let cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
 (* return the prefix and the suffix of the first occurrence of a slice,
    or None if this occurrence does not exist.
 *)
-let first_occ (slice : 'a list) (list : 'a list)
-    : ('a list * 'a list) option =
-  failwith "À compléter"
+
+let rec sub l a b =
+        if a = 0 && b = 0 then []
+        else
+  match l with
+  | [] -> []
+  | hd :: tl ->
+    if a > 0 then
+      sub tl (a-1) (b-1)
+    else if b >= 0 then
+      hd :: sub tl 0 (b-1)
+    else
+      []
+
+let first_occ (slice : 'a list) (list : 'a list) : ('a list * 'a list) option =
+        let rec aux l s i =
+                if sub l i (i + List.length s) = s then Some (sub l 0 i, sub l (i + List.length s) (List.length l))
+                else if i + List.length s < List.length l then aux l s (i + 1)
+                else None
+        in aux list slice 0
+;;
 (*
   first_occ [1; 2] [1; 1; 1; 2; 3; 4; 1; 2] = Some ([1; 1], [3; 4; 1; 2])
   first_occ [1; 1] [1; 1; 1; 2; 3; 4; 1; 2] = Some ([], [1; 2; 3; 4; 1; 2])
