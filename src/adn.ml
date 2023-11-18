@@ -58,7 +58,12 @@ let rec string_of_dna (seq : dna) : string =
 
 (* if list = pre@suf, return Some suf. otherwise, return None *)
 let cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
-  failwith "A faire"
+  let rec cut_search pre suf =
+    match pre,suf with
+    | [], suf -> Some(suf)
+    | h1::t1, h2::t2 when h1=h2 -> cut_search t1 t2
+    | _ -> None 
+  in cut_search slice list
 
 (*
   cut_prefix [1; 2; 3] [1; 2; 3; 4] = Some [4]
