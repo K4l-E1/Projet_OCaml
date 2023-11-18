@@ -105,7 +105,21 @@ let first_occ (slice : 'a list) (list : 'a list) : ('a list * 'a list) option =
 
 let rec slices_between
           (start : 'a list) (stop : 'a list) (list : 'a list) : 'a list list =
-  failwith "A faire"
+  let rec slices_search stock l =
+    let occ_start = first_occ start l in
+    match occ_start with
+    |None -> stock
+    |Some(l1,l2) ->
+      let occ_stop = first_occ stop l2 in
+      match occ_stop with
+      |None -> stock
+      |Some(l3,l4) ->
+        match l4 with
+        |[] -> stock
+        |_ -> slices_search (l3::stock) l4
+  in
+  List.rev (slices_search [] list)
+        
 
 (*
   slices_between [1; 1] [1; 2] [1; 1; 1; 1; 2; 1; 3; 1; 2] = [[1]]
