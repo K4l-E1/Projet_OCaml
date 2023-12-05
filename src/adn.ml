@@ -154,8 +154,25 @@ let consensus (list : 'a list) : 'a consensus =
    are empty, return the empty sequence.
  *)
 
+let transpose_lists (lists : 'a list list) : 'a list list =
+  let rec transpose acc = function
+    | [] -> acc
+    | [] :: rest -> transpose acc rest
+    | (hd :: tl) :: rest ->
+      let column = List.map List.hd acc in
+      let new_column = hd :: column in
+      let new_acc = List.map List.tl acc @ [new_column] in
+      transpose new_acc (tl :: rest)
+  in
+
+  match lists with
+  | [] -> []
+  | [] :: _ -> failwith "Pas la même taille"
+  | _ -> transpose (List.map (fun x -> [x]) (List.hd lists)) (List.tl lists)
+
 let consensus_sequence (ll : 'a list list) : 'a consensus list =
-  failwith "À compléter"
+        List.map consensus (transpose_lists ll)
+
 
 (*
  consensus_sequence [[1; 1; 1; 1];
