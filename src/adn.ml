@@ -150,7 +150,8 @@ let consensus (list : 'a list) : 'a consensus =
       let count_a = occ a in
       let max_count = max count_a occ_max in
       if count_a = occ_max then
-        find_partial b el_max a max_count
+        if(el_max == a) then find_partial b el_max el_same max_count
+        else find_partial b el_max a max_count
       else
         if count_a > occ_max then find_partial b a a max_count else find_partial b el_max el_max max_count
   in
