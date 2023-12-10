@@ -126,7 +126,7 @@ let rec slices_between
  *)
 
 let cut_genes (dna : dna) : (dna list) =
-  failwith "A faire"
+  slices_between (dna_of_string "ATG") (dna_of_string "TAA") dna
 
 (*---------------------------------------------------------------------------*)
 (*                          CONSENSUS SEQUENCES                              *)
@@ -140,7 +140,27 @@ type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus
    greatest number of occurrences and this number is equal to n,
    No_consensus otherwise. *)
 let consensus (list : 'a list) : 'a consensus =
-  failwith "À compléter"
+  let rec find_partial l2 el_max el_same occ_max =
+    match l2 with
+    | [] -> if(el_max == el_same) then Partial(el_max,occ_max) else No_consensus
+    | a :: b ->
+      let rec occ el =
+        List.fold_left (fun cpt x -> if x = el then cpt + 1 else cpt) 0 list
+      in
+      let count_a = occ a in
+      let max_count = max count_a occ_max in
+      if count_a = occ_max then
+        find_partial b el_max a max_count
+      else
+        if count_a > occ_max then find_partial b a a max_count else find_partial b el_max el_max max_count
+  in
+  let rec find_full l1 =
+          match l1 with
+          | [] -> No_consensus 
+          | [a] -> Full(List.hd list)
+          | a :: b :: c -> if(a == b) then find_full (b::c) else find_partial list (List.hd list) (List.hd list) 0
+  in find_full list
+
 
 (*
    consensus [1; 1; 1; 1] = Full 1
