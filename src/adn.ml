@@ -115,7 +115,7 @@ let rec slices_between
       |None -> stock
       |Some(l3,l4) ->
         match l4 with
-        |[] -> stock
+        |[] -> l3::stock
         |_ -> slices_search (l3::stock) l4
   in
   List.rev (slices_search [] list)
