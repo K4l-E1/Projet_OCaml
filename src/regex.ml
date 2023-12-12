@@ -9,7 +9,14 @@ let rec expr_repeat n e =
   else Concat (e, expr_repeat (n-1) e)
 
 let rec is_empty e =
-  failwith "À compléter"
+        match e with
+        | Base a -> false
+        | Eps -> true
+        | Joker -> false
+        | Concat (a,b) -> is_empty a && is_empty b
+        | Alt (a,b) -> is_empty a && is_empty b
+        | Star a -> is_empty a
+
 
 let rec null e =
   match e with 
@@ -21,7 +28,23 @@ let rec null e =
   | Star a -> true
 
 let rec is_finite e =
-  failwith "À compléter"
+  match e with
+        | Base a -> true
+        | Eps -> true
+        | Joker -> true
+        | Concat (a,b) -> is_finite a && is_finite b
+        | Alt (a,b) -> is_finite a && is_finite b
+        | Star a -> 
+                        match a with
+                        | Eps -> true
+                        | Concat(a,b) -> a = Eps && b = Eps
+                        | Alt(a,b) -> a = Eps && b = Eps
+                        | Joker -> false
+                        | Base a -> false
+                        | Star a -> is_finite a
+
+        
+
 
 let product l1 l2 =
   let rec aux l3 l4 =
@@ -30,8 +53,25 @@ let product l1 l2 =
     | a :: b -> List.map (fun el -> a @ el) l4 @ aux b l4
   in aux l1 l2
 
-let enumerate alphabet e =
-  failwith "À compléter"
+let rec enumerate alphabet e =
+        if is_finite e then
+        match e with
+        | Eps -> Some [[]]
+        | Base c -> Some [[c]]
+        | Joker -> Some (List.map (fun c -> [c]) alphabet)
+        | Concat (e1, e2) ->
+                        (match (enumerate alphabet e1, enumerate alphabet e2) with
+                                | (Some l1, Some l2) -> Some (product l1 l2)
+                                | _ -> None)
+        | Alt (e1, e2) -> 
+                        (match (enumerate alphabet e1, enumerate alphabet e2) with
+                        | (Some l1, Some l2) -> Some (List.sort_uniq compare (l1 @ l2))
+                        | _ -> None)
+
+        | Star e -> (match enumerate alphabet e with
+                | Some l -> Some (List.flatten (List.init 10 (fun n -> product l l)))       
+                | None -> None)
+        else None
 
 let rec alphabet_expr e =
   let rec aux l =
@@ -47,5 +87,5 @@ let rec alphabet_expr e =
 type answer =
   Infinite | Accept | Reject
 
-let accept_partial e w =
-  failwith "À compléter"
+let rec accept_partial e w =
+        if not (is_finite e) then Infinite else Reject
