@@ -139,6 +139,7 @@ type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus
    (Partial (a, n)) if a is the only element of the list with the
    greatest number of occurrences and this number is equal to n,
    No_consensus otherwise. *)
+
 let consensus (list : 'a list) : 'a consensus =
   let rec find_partial l2 el_max el_same occ_max =
     match l2 with
@@ -161,8 +162,6 @@ let consensus (list : 'a list) : 'a consensus =
           | [a] -> Full(List.hd list)
           | a :: b :: c -> if(a == b) then find_full (b::c) else find_partial list (List.hd list) (List.hd list) 0
   in find_full list
-
-
 (*
    consensus [1; 1; 1; 1] = Full 1
    consensus [1; 1; 1; 2] = Partial (1, 3)
@@ -175,24 +174,22 @@ let consensus (list : 'a list) : 'a consensus =
    are empty, return the empty sequence.
  *)
 
-let transpose_lists (lists : 'a list list) : 'a list list =
-  let rec transpose acc = function
-    | [] -> acc
-    | [] :: rest -> transpose acc rest
-    | (hd :: tl) :: rest ->
-      let column = List.map List.hd acc in
-      let new_column = hd :: column in
-      let new_acc = List.map List.tl acc @ [new_column] in
-      transpose new_acc (tl :: rest)
-  in
-
-  match lists with
+(*let transpose_lists lists =
+        if List.length lists = 0 then [] else
+        let rec aux ll l res compt1 compt2 =
+                                let n = List.length ll and m = List.length (List.nth ll 0) in
+                                if compt2 = m then res
+                                else if compt1 = n then aux ll [] (l::res) 0 (compt2+1)
+                                else aux ll l (List.append res [(List.nth (List.nth ll compt1) compt2)]) (compt1+1) compt2
+                                in aux lists [] [] 0 0
+*)
+let rec transpose = function
   | [] -> []
-  | [] :: _ -> failwith "Pas la même taille"
-  | _ -> transpose (List.map (fun x -> [x]) (List.hd lists)) (List.tl lists)
+  | []::_ -> []
+  | ll -> (List.map List.hd ll) :: transpose (List.map List.tl ll)
 
 let consensus_sequence (ll : 'a list list) : 'a consensus list =
-        List.map consensus (transpose_lists ll)
+        List.map consensus (transpose ll)
 
 
 (*
