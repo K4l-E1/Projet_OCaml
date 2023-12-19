@@ -88,4 +88,9 @@ type answer =
   Infinite | Accept | Reject
 
 let rec accept_partial e w =
-        if not (is_finite e) then Infinite else Reject
+  let alphabet_e = alphabet_expr e in
+  let alphabet = union_sorted alphabet_e w in
+  match enumerate alphabet e with
+  | None -> Infinite
+  | Some res -> if List.mem w res then Accept else Reject
+  
